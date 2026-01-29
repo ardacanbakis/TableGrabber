@@ -349,8 +349,11 @@ class TableGrabber {
     const selectorsToRemove = [
       // Tooltip and popover elements
       '[class*="tooltip"]',
+      '[class*="Tooltip"]',
       '[class*="popover"]',
+      '[class*="Popover"]',
       '[class*="hint"]',
+      '[class*="Hint"]',
       '[role="tooltip"]',
       // Screen reader only content
       '.sr-only',
@@ -371,12 +374,33 @@ class TableGrabber {
       '[class*="helper"]',
       // Icons that might have text
       '[class*="icon"]',
+      '[class*="Icon"]',
       'svg',
       'i.fa',
       'i.material-icons',
       // Dropdown menus
       '[class*="dropdown-menu"]',
       '[class*="menu-content"]',
+      // Hover/overlay content
+      '[class*="hover"]',
+      '[class*="Hover"]',
+      '[class*="overlay"]',
+      '[class*="Overlay"]',
+      '[class*="popup"]',
+      '[class*="Popup"]',
+      '[class*="flyout"]',
+      '[class*="Flyout"]',
+      // Info/details panels
+      '[class*="info-panel"]',
+      '[class*="detail"]',
+      '[class*="Detail"]',
+      '[class*="meta"]',
+      '[class*="Meta"]',
+      // Quickbase specific (based on your output)
+      '[class*="FieldInfo"]',
+      '[class*="field-info"]',
+      '[class*="fieldUsage"]',
+      '[class*="FieldUsage"]',
     ];
 
     selectorsToRemove.forEach(selector => {
@@ -387,15 +411,44 @@ class TableGrabber {
       }
     });
 
-    // Also remove any elements that are not visible (have zero dimensions)
-    // This catches dynamically hidden elements
+    // Remove absolutely positioned elements (usually tooltips/overlays)
     clone.querySelectorAll('*').forEach(el => {
       const style = window.getComputedStyle(el);
+
+      // Check for hidden elements
       if (style.display === 'none' ||
           style.visibility === 'hidden' ||
-          style.opacity === '0' ||
-          style.position === 'absolute' && style.left === '-9999px') {
+          style.opacity === '0') {
         el.remove();
+        return;
+      }
+
+      // Check for absolutely/fixed positioned elements (common for tooltips)
+      if (style.position === 'absolute' || style.position === 'fixed') {
+        el.remove();
+        return;
+      }
+
+      // Check for elements positioned off-screen
+      if (style.left === '-9999px' ||
+          style.left === '-10000px' ||
+          style.top === '-9999px' ||
+          style.transform?.includes('translate')) {
+        el.remove();
+        return;
+      }
+
+      // Check for high z-index (often tooltips)
+      const zIndex = parseInt(style.zIndex);
+      if (zIndex > 100) {
+        el.remove();
+        return;
+      }
+
+      // Check for pointer-events: none (common for overlay content)
+      if (style.pointerEvents === 'none') {
+        el.remove();
+        return;
       }
     });
 
@@ -421,6 +474,53 @@ class TableGrabber {
     }
 
     // Clean up the text
+    text = text.trim().replace(/\s+/g, ' ');
+
+    // Post-process: remove common tooltip patterns from the text itself
+    // Pattern: "Value Value (Type) Field ID: X ... Where is this field used?"
+    text = this.cleanTooltipPatterns(text);
+
+    return text;
+  }
+
+  cleanTooltipPatterns(text) {
+    if (!text) return text;
+
+    // Pattern 1: Remove "Where is this field used?" and everything after
+    const whereIsIdx = text.indexOf('Where is this field used?');
+    if (whereIsIdx > 0) {
+      text = text.substring(0, whereIsIdx);
+    }
+
+    // Pattern 2: Remove "Field ID: X" and everything after
+    const fieldIdMatch = text.match(/^(.+?)\s+Field ID:\s*\d+/);
+    if (fieldIdMatch) {
+      // Extract just the part before "Field ID:"
+      const beforeFieldId = text.substring(0, text.indexOf('Field ID:'));
+      text = beforeFieldId;
+    }
+
+    // Pattern 3: If text contains a duplicate (e.g., "Date Created Date Created (Date...")
+    // extract just the first occurrence
+    const words = text.trim().split(/\s+/);
+    if (words.length >= 2) {
+      // Look for duplicate patterns at the start
+      for (let len = 1; len <= Math.floor(words.length / 2); len++) {
+        const first = words.slice(0, len).join(' ');
+        const second = words.slice(len, len * 2).join(' ');
+        if (first === second) {
+          // Found duplicate, take just the first part
+          text = first;
+          break;
+        }
+      }
+    }
+
+    // Pattern 4: Remove trailing metadata patterns
+    // e.g., "(Date / Time)" at the end or parenthetical type info
+    text = text.replace(/\s*\([^)]+\)\s*$/, '');
+
+    // Clean up
     return text.trim().replace(/\s+/g, ' ');
   }
 
@@ -441,6 +541,11 @@ class TableGrabber {
           if (style.display === 'none' ||
               style.visibility === 'hidden' ||
               style.opacity === '0') {
+            return NodeFilter.FILTER_REJECT;
+          }
+
+          // Skip absolutely positioned parents
+          if (style.position === 'absolute' || style.position === 'fixed') {
             return NodeFilter.FILTER_REJECT;
           }
 
