@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TableGrabber</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>TableGrabber</h1>
+      <p class="subtitle">Capture tables from any website</p>
+    </header>
+
+    <div id="loading" class="loading hidden">
+      <div class="spinner"></div>
+      <span>Scanning for tables...</span>
+    </div>
+
+    <div id="no-tables" class="message hidden">
+      <p>No tables found on this page.</p>
+      <button id="scan-divs" class="btn btn-secondary">Scan for DIV Tables</button>
+    </div>
+
+    <div id="tables-found" class="hidden">
+      <div class="tables-header">
+        <span id="table-count">0 tables found</span>
+        <label class="checkbox-label">
+          <input type="checkbox" id="select-all">
+          <span>Select All</span>
+        </label>
+      </div>
+
+      <div id="tables-list" class="tables-list"></div>
+
+      <div class="export-section">
+        <h3>Export Selected</h3>
+
+        <div class="export-group">
+          <label>Format:</label>
+          <select id="export-format">
+            <option value="tsv">TSV (Tab-separated)</option>
+            <option value="csv">CSV (Comma-separated)</option>
+            <option value="markdown">Markdown</option>
+            <option value="json">JSON</option>
+          </select>
+        </div>
+
+        <div class="btn-group">
+          <button id="copy-clipboard" class="btn btn-primary">
+            <span class="icon">📋</span> Copy to Clipboard
+          </button>
+          <button id="download-csv" class="btn btn-secondary">
+            <span class="icon">📄</span> Download CSV
+          </button>
+          <button id="download-excel" class="btn btn-secondary">
+            <span class="icon">📊</span> Download Excel
+          </button>
+        </div>
+
+        <div class="btn-group">
+          <button id="export-sheets" class="btn btn-google">
+            <span class="icon">📗</span> Export to Google Sheets
+          </button>
+          <button id="screenshot" class="btn btn-secondary">
+            <span class="icon">📷</span> Screenshot as PNG
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="status" class="status hidden"></div>
+
+    <footer>
+      <button id="refresh-scan" class="btn btn-link">Refresh Scan</button>
+      <span class="divider">|</span>
+      <button id="toggle-highlight" class="btn btn-link">Toggle Highlights</button>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
