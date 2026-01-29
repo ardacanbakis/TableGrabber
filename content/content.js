@@ -77,15 +77,45 @@ class TableGrabber {
 
     // Find all HTML tables
     const htmlTables = document.querySelectorAll('table');
+    const allTables = [];
+    const allElements = [];
 
     htmlTables.forEach((table, index) => {
       // Skip hidden tables and very small tables
       if (this.isElementVisible(table) && this.hasMinimumContent(table)) {
         const tableInfo = this.extractTableInfo(table, index);
-        this.tables.push(tableInfo);
-        this.tableElements.push(table);
+        allTables.push(tableInfo);
+        allElements.push(table);
       }
     });
+
+    // Filter out bodyTable or layout tables if there are better alternatives
+    const layoutTableNames = ['bodytable', 'body-table', 'layouttable', 'layout-table', 'maintable', 'main-table', 'pagetable', 'page-table'];
+
+    if (allTables.length > 1) {
+      // If we have multiple tables, filter out likely layout tables
+      for (let i = 0; i < allTables.length; i++) {
+        const name = (allTables[i].name || '').toLowerCase();
+        const isLayoutTable = layoutTableNames.some(lt => name.includes(lt)) ||
+                              allElements[i].id?.toLowerCase().includes('body') ||
+                              allElements[i].id?.toLowerCase().includes('layout');
+
+        if (!isLayoutTable) {
+          this.tables.push(allTables[i]);
+          this.tableElements.push(allElements[i]);
+        }
+      }
+
+      // If filtering removed all tables, restore them
+      if (this.tables.length === 0) {
+        this.tables = allTables;
+        this.tableElements = allElements;
+      }
+    } else {
+      // Only one table, keep it
+      this.tables = allTables;
+      this.tableElements = allElements;
+    }
 
     return this.tables;
   }

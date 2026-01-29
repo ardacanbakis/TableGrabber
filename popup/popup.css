@@ -345,13 +345,11 @@ footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 12px;
+  padding: 10px 12px;
   background: #fff;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 2px solid #e5e7eb;
   border-radius: 8px 8px 0 0;
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  flex-shrink: 0;
 }
 
 .preview-toolbar-left {
@@ -527,6 +525,6 @@ footer {
 
 /* Wider popup for preview */
 body.preview-active {
-  min-width: 600px;
-  max-width: 800px;
+  min-width: 700px;
+  max-width: 1000px;
 }
