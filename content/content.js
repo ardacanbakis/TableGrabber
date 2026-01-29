@@ -33,8 +33,13 @@ class TableGrabber {
           break;
 
         case 'getTableData':
-          const data = this.getTableData(message.indices);
+          const data = this.getTableData(message.indices, message.excludedRows, message.excludedCols);
           sendResponse({ data });
+          break;
+
+        case 'getTablePreview':
+          const preview = this.getTablePreview(message.index);
+          sendResponse({ preview });
           break;
 
         case 'highlightTable':
@@ -335,31 +340,129 @@ class TableGrabber {
   }
 
   getCellText(cell) {
-    // Get text content, handling various cases
+    // Get only visible text content, excluding tooltips and hidden elements
+
+    // Clone the cell to avoid modifying the original
+    const clone = cell.cloneNode(true);
+
+    // Remove elements that typically contain tooltip/hidden content
+    const selectorsToRemove = [
+      // Tooltip and popover elements
+      '[class*="tooltip"]',
+      '[class*="popover"]',
+      '[class*="hint"]',
+      '[role="tooltip"]',
+      // Screen reader only content
+      '.sr-only',
+      '.visually-hidden',
+      '[aria-hidden="true"]',
+      // Hidden elements
+      '[style*="display: none"]',
+      '[style*="display:none"]',
+      '[style*="visibility: hidden"]',
+      '[style*="visibility:hidden"]',
+      '[hidden]',
+      // Common framework tooltip/helper classes
+      '.helper-text',
+      '.help-text',
+      '.field-help',
+      '.field-description',
+      '[class*="description"]',
+      '[class*="helper"]',
+      // Icons that might have text
+      '[class*="icon"]',
+      'svg',
+      'i.fa',
+      'i.material-icons',
+      // Dropdown menus
+      '[class*="dropdown-menu"]',
+      '[class*="menu-content"]',
+    ];
+
+    selectorsToRemove.forEach(selector => {
+      try {
+        clone.querySelectorAll(selector).forEach(el => el.remove());
+      } catch (e) {
+        // Invalid selector, skip
+      }
+    });
+
+    // Also remove any elements that are not visible (have zero dimensions)
+    // This catches dynamically hidden elements
+    clone.querySelectorAll('*').forEach(el => {
+      const style = window.getComputedStyle(el);
+      if (style.display === 'none' ||
+          style.visibility === 'hidden' ||
+          style.opacity === '0' ||
+          style.position === 'absolute' && style.left === '-9999px') {
+        el.remove();
+      }
+    });
+
     let text = '';
 
-    // Check for input elements
-    const input = cell.querySelector('input, textarea, select');
+    // Check for input elements first
+    const input = clone.querySelector('input, textarea, select');
     if (input) {
       text = input.value || input.placeholder || '';
     }
 
     // Check for images with alt text
-    const img = cell.querySelector('img');
-    if (img && img.alt) {
-      text = img.alt;
+    if (!text) {
+      const img = clone.querySelector('img');
+      if (img && img.alt) {
+        text = img.alt;
+      }
     }
 
-    // Fall back to text content
+    // Get text content from visible nodes only
     if (!text) {
-      text = cell.textContent || '';
+      text = this.getVisibleText(clone);
     }
 
     // Clean up the text
     return text.trim().replace(/\s+/g, ' ');
   }
 
-  getTableData(indices) {
+  getVisibleText(element) {
+    // Recursively get text only from visible text nodes
+    let text = '';
+
+    const walker = document.createTreeWalker(
+      element,
+      NodeFilter.SHOW_TEXT,
+      {
+        acceptNode: (node) => {
+          // Check if parent is visible
+          const parent = node.parentElement;
+          if (!parent) return NodeFilter.FILTER_REJECT;
+
+          const style = window.getComputedStyle(parent);
+          if (style.display === 'none' ||
+              style.visibility === 'hidden' ||
+              style.opacity === '0') {
+            return NodeFilter.FILTER_REJECT;
+          }
+
+          // Check if text is not just whitespace
+          if (!node.textContent.trim()) {
+            return NodeFilter.FILTER_REJECT;
+          }
+
+          return NodeFilter.FILTER_ACCEPT;
+        }
+      }
+    );
+
+    let node;
+    while (node = walker.nextNode()) {
+      text += node.textContent + ' ';
+    }
+
+    return text;
+  }
+
+  getTableData(indices, excludedRows = {}, excludedCols = {}) {
     const results = [];
 
     indices.forEach(index => {
@@ -367,18 +470,63 @@ class TableGrabber {
       if (!element) return;
 
       const tableInfo = this.tables[index];
+      let tableData;
 
       if (tableInfo.type === 'html') {
-        results.push(this.extractHtmlTableData(element));
+        tableData = this.extractHtmlTableData(element);
       } else {
         const divData = this.extractDivTableData(element);
-        if (divData && divData.data) {
-          results.push(divData.data);
-        }
+        tableData = divData && divData.data ? divData.data : [];
       }
+
+      // Apply row and column exclusions for this table
+      const tableExcludedRows = excludedRows[index] || [];
+      const tableExcludedCols = excludedCols[index] || [];
+
+      if (tableExcludedRows.length > 0 || tableExcludedCols.length > 0) {
+        tableData = this.applyExclusions(tableData, tableExcludedRows, tableExcludedCols);
+      }
+
+      results.push(tableData);
     });
 
     return results;
+  }
+
+  applyExclusions(data, excludedRows, excludedCols) {
+    // Filter out excluded rows
+    let filtered = data.filter((row, index) => !excludedRows.includes(index));
+
+    // Filter out excluded columns
+    if (excludedCols.length > 0) {
+      filtered = filtered.map(row =>
+        row.filter((cell, index) => !excludedCols.includes(index))
+      );
+    }
+
+    return filtered;
+  }
+
+  getTablePreview(index) {
+    const element = this.tableElements[index];
+    if (!element) return null;
+
+    const tableInfo = this.tables[index];
+    let data;
+
+    if (tableInfo.type === 'html') {
+      data = this.extractHtmlTableData(element);
+    } else {
+      const divData = this.extractDivTableData(element);
+      data = divData && divData.data ? divData.data : [];
+    }
+
+    return {
+      data,
+      rows: data.length,
+      cols: data[0] ? data[0].length : 0,
+      name: tableInfo.name
+    };
   }
 
   extractHtmlTableData(table) {

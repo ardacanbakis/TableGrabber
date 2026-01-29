@@ -329,3 +329,172 @@ footer {
 .tables-list::-webkit-scrollbar-thumb:hover {
   background: #a1a1a1;
 }
+
+/* Preview Section */
+.preview-section {
+  margin-top: 12px;
+  margin-bottom: 12px;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.preview-header h3 {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  margin: 0;
+}
+
+.preview-controls {
+  display: flex;
+  gap: 4px;
+}
+
+.btn-small {
+  padding: 4px 8px;
+  font-size: 11px;
+  border-radius: 4px;
+  background: #fff;
+  border: 1px solid #d1d5db;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.15s;
+  flex: none;
+}
+
+.btn-small:hover {
+  background: #e5e7eb;
+}
+
+.btn-small.active {
+  background: #2563eb;
+  color: white;
+  border-color: #2563eb;
+}
+
+.preview-info {
+  font-size: 11px;
+  color: #666;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.exclusion-info {
+  color: #dc2626;
+  font-weight: 500;
+}
+
+.preview-container {
+  max-height: 200px;
+  overflow: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.preview-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  table-layout: auto;
+}
+
+.preview-table th,
+.preview-table td {
+  padding: 4px 8px;
+  border: 1px solid #e5e7eb;
+  text-align: left;
+  white-space: nowrap;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.preview-table th {
+  background: #f3f4f6;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.preview-table tr:hover {
+  background: #f8fafc;
+}
+
+/* Row/Column exclusion styling */
+.preview-table tr.excluded {
+  background: #fee2e2 !important;
+  opacity: 0.6;
+}
+
+.preview-table td.excluded,
+.preview-table th.excluded {
+  background: #fee2e2 !important;
+  opacity: 0.6;
+}
+
+.preview-table tr.selectable:hover {
+  background: #dbeafe !important;
+  cursor: pointer;
+}
+
+.preview-table th.col-selectable:hover,
+.preview-table td.col-selectable:hover {
+  background: #dbeafe !important;
+  cursor: pointer;
+}
+
+/* Row number column */
+.preview-table .row-num {
+  background: #f3f4f6;
+  color: #666;
+  font-weight: 500;
+  text-align: center;
+  min-width: 30px;
+  cursor: default;
+}
+
+.preview-table .row-num.selectable {
+  cursor: pointer;
+}
+
+.preview-table .row-num.selectable:hover {
+  background: #dbeafe;
+}
+
+/* Preview scrollbar */
+.preview-container::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.preview-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.preview-container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.preview-container::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
+
+/* Wider popup for preview */
+body.preview-active {
+  min-width: 500px;
+  max-width: 600px;
+}
