@@ -174,14 +174,7 @@ class TableGrabberPopup {
       });
     });
 
-    // Select first table by default
-    if (this.tables.length > 0) {
-      const firstCheckbox = tablesList.querySelector('.table-checkbox');
-      if (firstCheckbox) {
-        firstCheckbox.checked = true;
-        this.updateSelection(0, true);
-      }
-    }
+    // Don't auto-select first table - let user choose to avoid lag on large tables
   }
 
   updateSelection(index, selected) {
