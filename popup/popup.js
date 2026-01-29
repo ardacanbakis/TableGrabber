@@ -321,7 +321,7 @@ class TableGrabberPopup {
         const isExcluded = this.excludedCols[this.currentPreviewIndex]?.includes(colIdx);
         const colClass = this.colSelectMode ? 'col-selectable' : '';
         const excludedClass = isExcluded ? 'excluded' : '';
-        html += `<th class="${colClass} ${excludedClass}" data-col="${colIdx}">${this.escapeHtml(this.truncate(cell, 30))}</th>`;
+        html += `<th class="${colClass} ${excludedClass}" data-col="${colIdx}">${this.escapeHtml(this.truncate(cell, 50))}</th>`;
       });
     }
     html += '</tr></thead><tbody>';
@@ -342,7 +342,7 @@ class TableGrabberPopup {
         const isColExcluded = this.excludedCols[this.currentPreviewIndex]?.includes(colIdx);
         const colClass = this.colSelectMode ? 'col-selectable' : '';
         const cellExcludedClass = isColExcluded ? 'excluded' : '';
-        html += `<td class="${colClass} ${cellExcludedClass}" data-col="${colIdx}">${this.escapeHtml(this.truncate(cell, 30))}</td>`;
+        html += `<td class="${colClass} ${cellExcludedClass}" data-col="${colIdx}">${this.escapeHtml(this.truncate(cell, 80))}</td>`;
       });
 
       html += '</tr>';

@@ -334,24 +334,58 @@ footer {
 .preview-section {
   margin-top: 12px;
   margin-bottom: 12px;
-  padding: 12px;
   background: #f8fafc;
   border-radius: 8px;
   border: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
 }
 
-.preview-header {
+.preview-toolbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  padding: 8px 12px;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  border-radius: 8px 8px 0 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
-.preview-header h3 {
+.preview-toolbar-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.preview-toolbar h3 {
   font-size: 13px;
   font-weight: 600;
   color: #374151;
   margin: 0;
+}
+
+.preview-stats {
+  font-size: 11px;
+  color: #666;
+}
+
+.exclusion-info {
+  color: #dc2626;
+  font-weight: 500;
+  margin-left: 8px;
+}
+
+.preview-toolbar-right {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.preview-header {
+  display: none;
 }
 
 .preview-controls {
@@ -360,7 +394,7 @@ footer {
 }
 
 .btn-small {
-  padding: 4px 8px;
+  padding: 6px 10px;
   font-size: 11px;
   border-radius: 4px;
   background: #fff;
@@ -369,6 +403,7 @@ footer {
   cursor: pointer;
   transition: all 0.15s;
   flex: none;
+  white-space: nowrap;
 }
 
 .btn-small:hover {
@@ -382,24 +417,14 @@ footer {
 }
 
 .preview-info {
-  font-size: 11px;
-  color: #666;
-  margin-bottom: 8px;
-  display: flex;
-  justify-content: space-between;
-}
-
-.exclusion-info {
-  color: #dc2626;
-  font-weight: 500;
+  display: none;
 }
 
 .preview-container {
-  max-height: 200px;
+  max-height: 350px;
   overflow: auto;
-  border: 1px solid #e5e7eb;
-  border-radius: 4px;
   background: #fff;
+  border-radius: 0 0 8px 8px;
 }
 
 .preview-table {
@@ -411,13 +436,15 @@ footer {
 
 .preview-table th,
 .preview-table td {
-  padding: 4px 8px;
+  padding: 6px 10px;
   border: 1px solid #e5e7eb;
   text-align: left;
-  white-space: nowrap;
-  max-width: 150px;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  word-wrap: break-word;
+  max-width: 250px;
+  min-width: 60px;
+  vertical-align: top;
+  line-height: 1.4;
 }
 
 .preview-table th {
@@ -426,6 +453,7 @@ footer {
   position: sticky;
   top: 0;
   z-index: 1;
+  white-space: nowrap;
 }
 
 .preview-table tr:hover {
@@ -461,8 +489,12 @@ footer {
   color: #666;
   font-weight: 500;
   text-align: center;
-  min-width: 30px;
+  min-width: 35px;
+  max-width: 35px;
   cursor: default;
+  position: sticky;
+  left: 0;
+  z-index: 1;
 }
 
 .preview-table .row-num.selectable {
@@ -475,18 +507,18 @@ footer {
 
 /* Preview scrollbar */
 .preview-container::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 
 .preview-container::-webkit-scrollbar-track {
   background: #f1f1f1;
-  border-radius: 3px;
+  border-radius: 4px;
 }
 
 .preview-container::-webkit-scrollbar-thumb {
   background: #c1c1c1;
-  border-radius: 3px;
+  border-radius: 4px;
 }
 
 .preview-container::-webkit-scrollbar-thumb:hover {
@@ -495,6 +527,6 @@ footer {
 
 /* Wider popup for preview */
 body.preview-active {
-  min-width: 500px;
-  max-width: 600px;
+  min-width: 600px;
+  max-width: 800px;
 }

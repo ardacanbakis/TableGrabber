@@ -36,23 +36,25 @@
 
       <!-- Table Preview Section -->
       <div id="preview-section" class="preview-section hidden">
-        <div class="preview-header">
-          <h3 id="preview-title">Table Preview</h3>
-          <div class="preview-controls">
-            <button id="toggle-row-select" class="btn btn-small" title="Toggle row selection mode">
+        <div class="preview-toolbar">
+          <div class="preview-toolbar-left">
+            <h3 id="preview-title">Table Preview</h3>
+            <div class="preview-stats">
+              <span id="preview-stats"></span>
+              <span id="exclusion-info" class="exclusion-info hidden"></span>
+            </div>
+          </div>
+          <div class="preview-toolbar-right">
+            <button id="toggle-row-select" class="btn btn-small" title="Click rows to exclude them">
               Exclude Rows
             </button>
-            <button id="toggle-col-select" class="btn btn-small" title="Toggle column selection mode">
+            <button id="toggle-col-select" class="btn btn-small" title="Click columns to exclude them">
               Exclude Cols
             </button>
             <button id="clear-exclusions" class="btn btn-small" title="Clear all exclusions">
               Clear
             </button>
           </div>
-        </div>
-        <div class="preview-info">
-          <span id="preview-stats"></span>
-          <span id="exclusion-info" class="exclusion-info hidden"></span>
         </div>
         <div id="preview-container" class="preview-container">
           <table id="preview-table" class="preview-table"></table>
