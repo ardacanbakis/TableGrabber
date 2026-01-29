@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Generate Icons</title>
+</head>
+<body>
+  <h1>Icon Generator for TableGrabber</h1>
+  <p>Right-click each canvas and save as PNG with the appropriate filename.</p>
+
+  <div>
+    <h3>icon16.png</h3>
+    <canvas id="icon16" width="16" height="16"></canvas>
+  </div>
+
+  <div>
+    <h3>icon48.png</h3>
+    <canvas id="icon48" width="48" height="48"></canvas>
+  </div>
+
+  <div>
+    <h3>icon128.png</h3>
+    <canvas id="icon128" width="128" height="128"></canvas>
+  </div>
+
+  <script>
+    function drawIcon(canvasId, size) {
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext('2d');
+
+      // Background
+      ctx.fillStyle = '#2563eb';
+      ctx.beginPath();
+      ctx.roundRect(0, 0, size, size, size * 0.15);
+      ctx.fill();
+
+      // Table grid
+      const padding = size * 0.15;
+      const gridSize = size - (padding * 2);
+      const cellWidth = gridSize / 3;
+      const cellHeight = gridSize / 3;
+
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = Math.max(1, size * 0.04);
+
+      // Outer rectangle
+      ctx.strokeRect(padding, padding, gridSize, gridSize);
+
+      // Vertical lines
+      for (let i = 1; i < 3; i++) {
+        ctx.beginPath();
+        ctx.moveTo(padding + (cellWidth * i), padding);
+        ctx.lineTo(padding + (cellWidth * i), padding + gridSize);
+        ctx.stroke();
+      }
+
+      // Horizontal lines
+      for (let i = 1; i < 3; i++) {
+        ctx.beginPath();
+        ctx.moveTo(padding, padding + (cellHeight * i));
+        ctx.lineTo(padding + gridSize, padding + (cellHeight * i));
+        ctx.stroke();
+      }
+
+      // Header row highlight
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.fillRect(padding + ctx.lineWidth/2, padding + ctx.lineWidth/2, gridSize - ctx.lineWidth, cellHeight - ctx.lineWidth);
+    }
+
+    drawIcon('icon16', 16);
+    drawIcon('icon48', 48);
+    drawIcon('icon128', 128);
+  </script>
+</body>
+</html>
